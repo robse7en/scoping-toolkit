@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local/session artifacts (not part of the toolkit itself)
+.claude/settings.local.json
+.claude/agent-memory-local/
+
+# If this toolkit is dropped into a real project, that project's own
+# build artifacts shouldn't be tracked here either:
+node_modules/
+bin/
+obj/
+dist/
