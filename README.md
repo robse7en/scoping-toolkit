@@ -16,8 +16,37 @@ database, no hidden state.
 
 ## Install
 
-Copy `.claude/` and `docs/project-scope/_templates/` into the root of your project repository.
-That's it — no dependencies beyond Claude Code itself.
+This toolkit has two parts that install differently:
+
+- **`.claude/agents/` and `.claude/commands/`** — the agent/command definitions. Install either
+  **personally** (`~/.claude/`, available in every project on your machine) or **per-project**
+  (`<project>/.claude/`, shared with your team via version control). Pick one.
+- **`docs/project-scope/_templates/`** — the schema for generated files. This is always
+  **per-project**, regardless of where the agents live, since the files it generates
+  (`constraints.md`, `architecture.md`, task files, etc.) get committed alongside the project
+  being scoped, not kept as personal config.
+
+### Personal install (every project on your machine)
+
+```bash
+mkdir -p ~/.claude/agents ~/.claude/commands
+cp .claude/agents/*.md ~/.claude/agents/
+cp .claude/commands/*.md ~/.claude/commands/
+```
+
+Then, for each project where you'll run `/scope`:
+
+```bash
+cd ~/path/to/your-project
+mkdir -p docs/project-scope
+cp -r ~/path/to/this-toolkit/docs/project-scope/_templates docs/project-scope/
+```
+
+Restart any open Claude Code session afterward — subagent/command files are loaded at session
+start, so a session already running won't pick up files added mid-session. Verify with `/agents`
+(Library tab, under **Personal**) or by typing `/scope` and checking it autocompletes.
+
+### Project install (shared with your team via version control)
 
 ```
 your-project/
@@ -29,7 +58,8 @@ your-project/
       _templates/   # schema every generated file conforms to
 ```
 
-Commit `.claude/` and the templates to version control so your whole team uses the same agents.
+Copy `.claude/` and `docs/project-scope/_templates/` into the project repo root and commit them,
+so your whole team uses the same agent definitions.
 
 ## The workflow, end to end
 
@@ -104,8 +134,8 @@ your explicit approval — and then prompts a `scope-reviewer` sweep to catch an
 | File | Written by | Notes |
 |---|---|---|
 | `docs/project-scope/research-summary.md` | `research-agent` | New projects only |
-| `docs/project-scope/existing-system-context.md` | `codebase-analyst` | Extension projects only |
-| `docs/project-scope/constraints.md` | `interviewer`, `feature-suggester` | Binding answers: stack, multi-tenancy, security, out-of-scope |
+| `docs/project-scope/existing-system-context.md` | `codebase-analyst` | Extension projects only. Flags codebase inconsistencies without resolving them — see `constraints.md` below. |
+| `docs/project-scope/constraints.md` | `interviewer`, `feature-suggester` | Binding answers, derived from the project's actual needs — typically stack, access model, security, out-of-scope. Sections are fill-when-relevant, not a fixed checklist. For extensions, also records the user's binding resolution of any inconsistency `codebase-analyst` flagged — `architect-agent` follows this decision, not the analyst's raw observation. |
 | `docs/project-scope/architecture.md` | `architect-agent` only | Binding technical blueprint. Versioned. |
 | `docs/project-scope/decisions.md` | `architect-agent` only | Append-only ADR log |
 | `docs/project-scope/manifest.md` | `/sync-manifest` only | Generated rollup — never hand-edit |
