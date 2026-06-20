@@ -1,4 +1,4 @@
-# Claude Code Scoping Toolkit
+# Scoping Toolkit
 
 A workflow for scoping and implementing software projects with Claude Code, designed so that
 implementation work can happen across many independent, context-limited sessions without losing
