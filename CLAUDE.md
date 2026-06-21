@@ -5,9 +5,9 @@ repository.
 
 ## What this repository is
 
-A workflow toolkit, not an application to build or run. It consists entirely of
-Markdown and YAML files: slash command definitions, subagent definitions, and
-document templates. There is no build step and no runtime.
+A workflow toolkit, not an application service to deploy. The primary product
+surface is still Markdown and YAML, but the repo also contains deterministic
+project-scoped Python helper scripts and a small test suite for those helpers.
 
 ## Repository structure
 
@@ -17,6 +17,7 @@ document templates. There is no build step and no runtime.
   commands/    # 8 slash command definitions
 docs/project-scope/
   _templates/  # schema files for generated scope documents
+  _scripts/    # deterministic helper scripts invoked by commands
 .serena/
   project.yml  # Serena MCP tool configuration for this repo
 ```
@@ -49,7 +50,7 @@ from `/sync-manifest`.
 | `/amend-architecture <task-id>` | Resolve a blocked task via architecture amendment |
 | `/verify-scope features|artifacts|all` | Write feature or artifact verification reports |
 | `/converge-scope all|<task-id>` | Write an implementation-to-scope convergence report |
-| `/sync-manifest` | Regenerate `manifest.md` from task frontmatter |
+| `/sync-manifest` | Regenerate `manifest.md` through the deterministic helper script |
 | `/status` | Print a progress and verification summary |
 
 ## Single-writer rule
@@ -109,3 +110,9 @@ When modifying agent or command definitions:
 - Template changes require reviewing every agent or command that reads or writes
   that artifact type, including the override lookup path under
   `docs/project-scope/_templates/overrides/`.
+- Deterministic helper scripts currently live under
+  `docs/project-scope/_scripts/`.
+- Verify helper-script changes with:
+  `python -m unittest tests.test_sync_manifest -v`
+  and
+  `.\tests\validate-agent-contracts.ps1`

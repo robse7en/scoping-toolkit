@@ -6,6 +6,7 @@ context-limited sessions without losing the thread. Discovery, architecture,
 verification, and planning happen up front with explicit human checkpoints.
 Implementation happens task-by-task, each task self-contained enough that a
 brand-new session can pick it up with no memory of anything that came before.
+Deterministic helper scripts live alongside the Markdown workflow artifacts.
 
 ## Why this exists
 
@@ -17,7 +18,8 @@ hidden state.
 
 ## Install
 
-This toolkit has two parts that install differently:
+This toolkit has two project-scoped content directories plus the Claude command
+and agent definitions:
 
 - `.claude/agents/` and `.claude/commands/`: the agent and command definitions.
   Install either personally (`~/.claude/`) or per-project (`<project>/.claude/`).
@@ -25,6 +27,8 @@ This toolkit has two parts that install differently:
   always per-project because the generated files live in the target repo.
   Project-local template overrides can be placed under
   `docs/project-scope/_templates/overrides/`.
+- `docs/project-scope/_scripts/`: deterministic helper scripts that generated
+  commands invoke. Python 3.9 or newer is required for these helpers.
 
 ### Personal install
 
@@ -40,6 +44,7 @@ Then, for each target project:
 cd ~/path/to/your-project
 mkdir -p docs/project-scope
 cp -r ~/path/to/this-toolkit/docs/project-scope/_templates docs/project-scope/
+cp -r ~/path/to/this-toolkit/docs/project-scope/_scripts docs/project-scope/
 ```
 
 Restart any open Claude Code session afterward so the new agents and commands
@@ -55,10 +60,12 @@ your-project/
   docs/
     project-scope/
       _templates/  # schema every generated file conforms to
+      _scripts/    # deterministic helper scripts such as manifest sync
 ```
 
-Copy `.claude/` and `docs/project-scope/_templates/` into the project repo root
-and commit them so the team uses the same workflow definitions.
+Copy `.claude/`, `docs/project-scope/_templates/`, and
+`docs/project-scope/_scripts/` into the project repo root and commit them so
+the team uses the same workflow definitions.
 
 ## Workflow
 
@@ -109,7 +116,7 @@ needed scope verification.
 | `/amend-architecture <task-id>` | Resolve a blocked task by amending `architecture.md` |
 | `/verify-scope features|artifacts|all` | Write read-only scope verification reports before implementation |
 | `/converge-scope all|<task-id>` | Compare current implementation state against scoped intent |
-| `/sync-manifest` | Regenerate `manifest.md` from task file frontmatter |
+| `/sync-manifest` | Regenerate `manifest.md` through the deterministic helper script |
 | `/status` | Quick human-readable progress and verification summary |
 
 ## Agents
@@ -136,7 +143,7 @@ needed scope verification.
 | `docs/project-scope/constraints.md` | `interviewer`, `feature-suggester` | Binding answers, including engineering principles such as YAGNI, KISS, DRY, SOLID, user scenarios, and out-of-scope |
 | `docs/project-scope/architecture.md` | `architect-agent` only | Binding technical blueprint |
 | `docs/project-scope/decisions.md` | `architect-agent` only | Append-only ADR log |
-| `docs/project-scope/manifest.md` | `/sync-manifest` only | Generated rollup |
+| `docs/project-scope/manifest.md` | `/sync-manifest` only | Generated rollup from a deterministic Python helper |
 | `docs/project-scope/phases/phase-N-<slug>/tasks/*.md` | `task-writer`, `/implement`, `/qa`, `scope-reviewer` | One file per task |
 | `docs/project-scope/verification/*.md` | `scope-verifier` only | Read-only reports for feature review, artifact consistency, and convergence |
 
@@ -166,3 +173,12 @@ blocked architecture conflict.
   and scope artifacts are rechecked before implementation starts.
 - Block, do not improvise. If architecture does not fit reality, surface the
   conflict instead of silently changing course.
+
+## Deterministic Tooling
+
+`/sync-manifest` is now an executable transformation, not a model-generated one.
+It delegates parsing, validation, rendering, and file replacement to:
+
+`docs/project-scope/_scripts/sync_manifest.py`
+
+The helper requires Python 3.9 or newer.
