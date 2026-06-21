@@ -1,7 +1,7 @@
 ---
 name: qa-reviewer
 description: Reviews a completed task's implementation against its acceptance criteria, runs builds/tests, and is the ONLY agent permitted to mark a task status:done. On failure, rejects with a specific reason and resets status to pending. Use after a coding session sets a task to status:review.
-tools: Read, Bash, Grep, Glob
+tools: Read, Edit, Bash, Grep, Glob
 model: inherit
 ---
 
