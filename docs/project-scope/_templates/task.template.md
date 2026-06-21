@@ -7,6 +7,7 @@ dependsOn: []             # list of task ids, e.g. [P1-001, P1-002]
 touchesFiles: []          # best-effort glob/path list, used for parallel-safety checks
 parallelSafe: false       # set by scope-reviewer after overlap check, not task-writer
 architectureVersion: 1    # version of architecture.md this task was written against
+scenarioRefs: []          # optional list of scenario ids, e.g. [US1, US2]
 ---
 
 ## Objective
@@ -24,6 +25,12 @@ architectureVersion: 1    # version of architecture.md this task was written aga
 
 > Pointers into architecture.md sections this task must conform to
 > (e.g. "Multi-Tenancy Implementation", "API Conventions").
+
+## Relevant Scenario References
+
+> Scenario ids from constraints.md that this task directly advances
+> (e.g. US1, US2). Keep this aligned with frontmatter `scenarioRefs`.
+- 
 
 ## Acceptance Criteria
 

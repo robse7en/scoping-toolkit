@@ -12,3 +12,4 @@ The user wants QA review for task `$ARGUMENTS`.
 4. Relay its verdict to the user in full: pass (now done), reject (back to pending, with the specific rejection reason), or architecture conflict (now blocked, needs `/amend-architecture`).
 5. If multiple tasks are ready for review, you may invoke `qa-reviewer` once per task — but always one task per invocation, never batch several tasks into a single qa-reviewer call, since each review needs its own focused verification pass against that task's specific acceptance criteria.
 6. After QA completes (pass or reject), suggest running `/sync-manifest` to refresh the progress rollup.
+7. If QA passes and the user wants a scope-versus-code report, suggest `/converge-scope $ARGUMENTS`.
