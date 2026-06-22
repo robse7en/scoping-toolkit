@@ -20,3 +20,7 @@ dist/
 
 # Isolated feature workspaces
 .worktrees/
+/tests/__pycache__
+/.serena
+/docs/superpowers
+/docs/project-scope/_scripts/__pycache__
