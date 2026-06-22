@@ -16,6 +16,35 @@
 - **Type:** new | extension
 - **One-line description:**
 
+## Engineering Principles
+> Project-specific non-negotiables that downstream agents must treat as binding.
+> Default these to YAGNI, KISS, DRY, and SOLID unless the user explicitly says
+> otherwise. Treat "one-liner solution" as "prefer the simplest solution that
+> can be explained in one line," not as a requirement to compress code into a
+> literal single line.
+- **Code quality bar:** (e.g. DRY, SOLID, readability over cleverness)
+- **Testing expectations:**
+- **Simplicity / anti-overengineering guardrails:** (e.g. YAGNI, KISS, one-line explainability)
+- **Review / release expectations:**
+- **Other non-negotiables:**
+
+## User Scenarios & Success Criteria
+> Capture the main user journeys this scope must deliver. Keep them concrete,
+> independently valuable where possible, and paired with measurable success
+> checks so downstream agents can trace work back to user outcomes.
+
+### US1
+- **Title:**
+- **User journey:**
+- **Why it matters:**
+- **Independent success check:**
+- **Measurable outcomes:**
+  - 
+
+### Additional scenarios
+> Add US2, US3, etc. only when the project genuinely has distinct user journeys.
+- 
+
 ## Tech Stack
 - **Backend:**
 - **Frontend:**

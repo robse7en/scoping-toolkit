@@ -17,3 +17,6 @@ node_modules/
 bin/
 obj/
 dist/
+
+# Isolated feature workspaces
+.worktrees/

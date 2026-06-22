@@ -12,3 +12,4 @@ Steps:
 3. Invoke the `architect-agent` subagent in Mode 2 (Amend Architecture), passing the task id.
 4. Relay the architect's proposed diff (or "no amendment needed" verdict) to the user and wait for explicit approval before any file is written. The subagent itself will hold for approval — do not approve on the user's behalf.
 5. After the architect-agent completes, remind the user to run the scope-reviewer sweep (you can offer to invoke it) to check whether other tasks are invalidated by this change.
+6. Once the sweep is complete, suggest `/verify-scope artifacts` because any architecture change can stale the previous artifact verification report.
