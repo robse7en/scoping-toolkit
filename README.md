@@ -57,7 +57,7 @@ load.
 your-project/
   .claude/
     agents/        # 10 subagent definitions
-    commands/      # 8 slash commands
+    commands/      # 8 command definitions covering 9 user-facing slash commands
   docs/
     project-scope/
       _templates/  # schema every generated file conforms to
@@ -101,6 +101,12 @@ the team uses the same workflow definitions.
    /status
 ```
 
+`/verify-scope artifacts` writes
+`docs/project-scope/verification/artifact-consistency.md` with machine-readable
+frontmatter fields such as `criticalFindings`, `generatedAt`,
+`architectureVersionChecked`, and `taskPathsChecked`. `/implement <task-id>`
+uses that report as a gate and stale-check before implementation continues.
+
 If a coding or QA session hits a real architecture mismatch mid-project, the
 task is set to `blocked` rather than worked around. You resolve it with
 `/amend-architecture <task-id>`, then re-run the post-amendment review and any
@@ -112,12 +118,12 @@ needed scope verification.
 |---|---|
 | `/scope new "<description>"` | Start scoping a brand-new project |
 | `/scope extend "<description>"` | Start scoping an additional module for an existing system |
-| `/implement <task-id>` | Run in a fresh session to implement one task |
-| `/qa <task-id>` | The only path by which a task can reach `status: done` |
+| `/implement <task-id>` | Run in a fresh session to implement one task after dependency and artifact-verification checks pass |
+| `/qa <task-id>` | Mechanically verify acceptance criteria and become the only path by which a task can reach `status: done` |
 | `/amend-architecture <task-id>` | Resolve a blocked task by amending `architecture.md` |
 | `/verify-scope features|artifacts|all` | Write read-only scope verification reports before implementation |
 | `/converge-scope all|<task-id>` | Compare current implementation state against scoped intent |
-| `/sync-manifest` | Regenerate `manifest.md` through the deterministic helper script |
+| `/sync-manifest` | Regenerate `manifest.md` through the deterministic helper script from constrained frontmatter |
 | `/status` | Quick human-readable progress and verification summary |
 
 ## Agents
@@ -146,7 +152,7 @@ needed scope verification.
 | `docs/project-scope/decisions.md` | `architect-agent` only | Append-only ADR log |
 | `docs/project-scope/manifest.md` | `/sync-manifest` only | Generated rollup from a deterministic Python helper |
 | `docs/project-scope/phases/phase-N-<slug>/tasks/*.md` | `task-writer`, `/implement`, `/qa`, `scope-reviewer` | One file per task |
-| `docs/project-scope/verification/*.md` | `scope-verifier` only | Read-only reports for feature review, artifact consistency, and convergence |
+| `docs/project-scope/verification/*.md` | `scope-verifier` only | Read-only reports for feature review, artifact consistency, and convergence; artifact consistency includes machine-readable frontmatter used by `/implement` |
 
 ## Task status lifecycle
 
@@ -162,6 +168,10 @@ pending --(/implement)--> in-progress --(criteria met)--> review --(/qa pass)-->
 
 Only `qa-reviewer` sets `status: done`. Only `architect-agent` resolves a
 blocked architecture conflict.
+
+`qa-reviewer` also blocks a task if its `architectureVersion` is stale relative
+to the current `architecture.md`; a task does not become done against an old
+architecture.
 
 ## Design principles
 
@@ -183,3 +193,13 @@ It delegates parsing, validation, rendering, and file replacement to:
 `docs/project-scope/_scripts/sync_manifest.py`
 
 The helper requires Python 3.9 or newer.
+
+## Validation
+
+When you modify the toolkit itself, verify the deterministic helper behavior and
+agent contract assumptions before committing:
+
+```powershell
+python -m unittest tests.test_sync_manifest -v
+.\tests\validate-agent-contracts.ps1
+```
