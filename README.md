@@ -70,36 +70,7 @@ the team uses the same workflow definitions.
 
 ## Workflow
 
-```text
-/scope new "Visitor Management System"
-        |
-        |- research-agent / codebase-analyst      (research-summary.md / existing-system-context.md)
-        |- interviewer                             (constraints.md)
-        |- feature-suggester                       (adds approved optional features)
-        |- scope-verifier (features)               (feature-necessity.md)
-        |- architect-agent                         (architecture.md, decisions.md)
-        |- planner                                 (phase folders, manifest.md skeleton)
-        |- task-writer (per phase)                 (task files)
-        |- scope-reviewer (per phase)              (parallelSafe, rework findings)
-        |- scope-verifier (artifacts)              (artifact-consistency.md)
-        |
-        v
-   /sync-manifest
-        |
-        v
-   Manual review of architecture, decisions, manifest, verification reports, and tasks
-        |
-        v
-   (new session) /implement P1-001   -> status: review
-        |
-   (same or new session) /qa P1-001  -> status: done
-        |
-        v
-   /sync-manifest
-        |
-        v
-   /status
-```
+https://github.com/robse7en/scoping-toolkit/blob/main/docs/assets/scoping-toolkit-workflow.png
 
 `/verify-scope artifacts` writes
 `docs/project-scope/verification/artifact-consistency.md` with machine-readable
