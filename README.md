@@ -203,3 +203,13 @@ agent contract assumptions before committing:
 python -m unittest tests.test_sync_manifest -v
 .\tests\validate-agent-contracts.ps1
 ```
+
+## Attribution
+
+This toolkit is independently implemented, but parts of the workflow design
+were informed by [GitHub Spec Kit](https://github.com/github/spec-kit), which
+is released under the MIT License.
+
+## License
+
+This project is licensed under the terms of the MIT License. See [LICENSE](LICENSE).
