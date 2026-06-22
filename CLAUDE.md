@@ -36,8 +36,8 @@ The toolkit separates two phases:
 2. Implementation: `/implement <task-id>` runs in a fresh session and loads
    only `constraints.md`, `architecture.md`, `decisions.md`, and one task file.
 
-Progress is tracked in task frontmatter. `manifest.md` is a generated rollup
-from `/sync-manifest`.
+Progress is tracked in constrained frontmatter. `manifest.md` is a generated
+rollup from `/sync-manifest`.
 
 ## Slash commands
 
@@ -70,7 +70,8 @@ never set `status: done`.
 
 ## Task file frontmatter
 
-Every task under `docs/project-scope/phases/*/tasks/*.md` uses this frontmatter:
+Every task under `docs/project-scope/phases/*/tasks/*.md` uses this constrained
+frontmatter format:
 
 ```yaml
 id: P1-001

@@ -127,6 +127,27 @@ class GenerateManifestTests(unittest.TestCase):
             second = self.sync.generate_manifest(Path(directory), "fixed")
             self.assertEqual(first.encode("utf-8"), second.encode("utf-8"))
 
+    def test_manifest_escapes_markdown_table_cells(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = ManifestFixture(directory)
+            fixture.add_task(
+                "phase-1-foundation",
+                "P1-001.md",
+                task_id="P1-001",
+                phase=1,
+                title="Create | foundation",
+                status="blocked",
+                conflict="- Needs | separation\n- and a second line",
+            )
+
+            output = self.sync.generate_manifest(Path(directory), timestamp="fixed")
+
+            self.assertIn(
+                "| P1-001 | 1 | Create \\| foundation | Needs \\| separation |",
+                output,
+            )
+            self.assertNotIn("| P1-001 | 1 | Create | foundation", output)
+
     def test_validation_cases_raise_specific_errors(self):
         cases = [
             (
@@ -296,6 +317,16 @@ class GenerateManifestTests(unittest.TestCase):
         self.assertNotIn("Read each file's YAML frontmatter", command)
         self.assertNotIn("Write the result to `docs/project-scope/manifest.md`", command)
 
+    def test_sync_command_and_docs_describe_constrained_frontmatter(self):
+        command = (REPO_ROOT / ".claude/commands/sync-manifest.md").read_text(
+            encoding="utf-8"
+        )
+        guidance = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+
+        self.assertIn("constrained frontmatter", command)
+        self.assertIn("constrained frontmatter", guidance)
+        self.assertNotIn("YAML frontmatter", command)
+
     def test_documentation_covers_script_installation_and_tests(self):
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
         guidance = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
@@ -307,6 +338,33 @@ class GenerateManifestTests(unittest.TestCase):
         )
         self.assertIn("python -m unittest", guidance)
         self.assertIn("validate-agent-contracts.ps1", guidance)
+
+    def test_artifact_report_template_has_machine_readable_frontmatter(self):
+        template = (
+            REPO_ROOT / "docs/project-scope/_templates/artifact-analysis.template.md"
+        ).read_text(encoding="utf-8")
+        command = (REPO_ROOT / ".claude/commands/implement.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertTrue(template.startswith("---\n"))
+        self.assertIn("criticalFindings:", template)
+        self.assertIn("generatedAt:", template)
+        self.assertIn("architectureVersionChecked:", template)
+        self.assertIn("taskPathsChecked:", template)
+        self.assertIn("Read the verification report frontmatter", command)
+        self.assertIn("`criticalFindings`", command)
+        self.assertIn("`generatedAt`", command)
+        self.assertIn("`architectureVersionChecked`", command)
+
+    def test_qa_reviewer_has_explicit_stale_architecture_failure_path(self):
+        qa_reviewer = (REPO_ROOT / ".claude/agents/qa-reviewer.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("If the task's `architectureVersion` does not match", qa_reviewer)
+        self.assertIn("Set `status: blocked`", qa_reviewer)
+        self.assertIn("Do not mark the task done", qa_reviewer)
 
 
 if __name__ == "__main__":

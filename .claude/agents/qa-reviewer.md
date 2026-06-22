@@ -19,6 +19,15 @@ you. You are stricter than friendly; a task that mostly works is not done.
    builds/tests instead of assuming they work.
 5. Check code quality against the engineering principles and architecture.
 
+### If the task's `architectureVersion` does not match
+
+- Do not mark the task done.
+- Set `status: blocked`.
+- Append to `Architecture Conflict` that the task was reviewed against a stale
+  architecture version and needs `/amend-architecture <task-id>` or a rescope
+  decision before QA can continue.
+- Report back the version mismatch explicitly.
+
 ### If everything passes
 
 - Set `status: done`.

@@ -22,15 +22,21 @@ beyond what you load here.
 3. Check `dependsOn`. For each listed task id, confirm its status is `done`. If
    any dependency is incomplete, stop and tell the user which dependency is not
    done.
-4. Check for
-   `docs/project-scope/verification/artifact-consistency.md`:
-   - If it exists and it reports critical findings, stop and tell the user the
+4. Check for `docs/project-scope/verification/artifact-consistency.md`:
+   - Read the verification report frontmatter, not just the prose body.
+   - If `criticalFindings` is greater than zero, stop and tell the user the
      scope still has blocking verification issues.
-   - If it exists but is stale relative to `architecture.md` or the task file,
-     warn the user and recommend `/verify-scope artifacts` before proceeding.
-   - If it does not exist, warn the user that implementation is starting
-     without artifact verification and ask for explicit confirmation before
-     continuing.
+   - Treat the report as stale if any of these are true:
+     - `architectureVersionChecked` does not match the current
+       `architecture.md` version
+     - the current task file is missing from `taskPathsChecked`
+     - `generatedAt` predates the last modification time of `architecture.md`
+       or the current task file
+   - If the report is stale, warn the user and recommend
+     `/verify-scope artifacts` before proceeding.
+   - If the report does not exist, warn the user that implementation is
+     starting without artifact verification and ask for explicit confirmation
+     before continuing.
 5. Load context, in this order: `constraints.md`, `architecture.md`,
    `decisions.md`, then the full task file. Do not load other task files or the
    manifest unless needed to resolve a specific blocker.

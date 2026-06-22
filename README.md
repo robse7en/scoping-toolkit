@@ -13,8 +13,9 @@ Deterministic helper scripts live alongside the Markdown workflow artifacts.
 Long-running AI coding sessions degrade: context fills up, earlier decisions get
 forgotten, and architecture drifts task to task. This toolkit separates
 deciding what to build and how from building it. Progress is tracked entirely in
-markdown files committed to the repo. There is no external database and no
-hidden state.
+markdown files committed to the repo. Task metadata uses a constrained
+frontmatter format rather than general YAML. There is no external database and
+no hidden state.
 
 ## Install
 

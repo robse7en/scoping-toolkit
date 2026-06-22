@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+"""Regenerate manifest.md from constrained task frontmatter.
+
+This helper intentionally supports the repo's constrained frontmatter format:
+- one scalar field per line
+- inline lists only, such as [P1-001, P1-002]
+- no multiline scalars or block-list YAML features
+"""
 
 import argparse
 import os
@@ -42,6 +49,11 @@ class Task:
     parallel_safe: bool
     architecture_version: int
     blocked_reason: str
+
+
+def markdown_table_cell(value: str) -> str:
+    normalized = re.sub(r"\s+", " ", value).strip()
+    return normalized.replace("|", r"\|")
 
 
 def strip_inline_comment(value: str) -> str:
@@ -247,7 +259,7 @@ def render_manifest(tasks: list[Task], version: int, timestamp: str) -> str:
     phases = sorted({task.phase for task in tasks})
     for phase in phases:
         phase_tasks = [task for task in tasks if task.phase == phase]
-        name = phase_tasks[0].phase_name
+        name = markdown_table_cell(phase_tasks[0].phase_name)
         counts = {status: sum(task.status == status for task in phase_tasks) for status in VALID_STATUSES}
         lines.append(
             f"| {phase} - {name} | {len(phase_tasks)} | {counts['pending']} | "
@@ -266,7 +278,8 @@ def render_manifest(tasks: list[Task], version: int, timestamp: str) -> str:
     for task in tasks:
         if task.status == "blocked":
             lines.append(
-                f"| {task.task_id} | {task.phase} | {task.title} | {task.blocked_reason} |"
+                f"| {markdown_table_cell(task.task_id)} | {task.phase} | "
+                f"{markdown_table_cell(task.title)} | {markdown_table_cell(task.blocked_reason)} |"
             )
 
     for phase in phases:
@@ -281,10 +294,11 @@ def render_manifest(tasks: list[Task], version: int, timestamp: str) -> str:
             ]
         )
         for task in phase_tasks:
-            dependencies = ", ".join(task.depends_on) if task.depends_on else "-"
+            dependencies = ", ".join(markdown_table_cell(item) for item in task.depends_on) if task.depends_on else "-"
             parallel_safe = "true" if task.parallel_safe else "false"
             lines.append(
-                f"| {task.task_id} | {task.title} | {task.status} | {dependencies} | {parallel_safe} |"
+                f"| {markdown_table_cell(task.task_id)} | {markdown_table_cell(task.title)} | "
+                f"{markdown_table_cell(task.status)} | {dependencies} | {parallel_safe} |"
             )
 
     return "\n".join(lines) + "\n"

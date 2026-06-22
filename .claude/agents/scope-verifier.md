@@ -73,6 +73,9 @@ Triggered after tasks are written and scope-reviewed, or whenever the user runs
 4. Write `docs/project-scope/verification/artifact-consistency.md` using
    `artifact-analysis.template.md`.
 5. In the report, include:
+   - frontmatter fields for `reportMode`, `generatedAt`, `criticalFindings`,
+     `highFindings`, `mediumFindings`, `architectureVersionChecked`, and
+     `taskPathsChecked`
    - a findings table
    - scenario coverage table
    - approved feature coverage table
