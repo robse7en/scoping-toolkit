@@ -69,8 +69,7 @@ Copy `.claude/`, `docs/project-scope/_templates/`, and
 the team uses the same workflow definitions.
 
 ## Workflow
-
-https://github.com/robse7en/scoping-toolkit/blob/main/docs/assets/scoping-toolkit-workflow.png
+![Workflow](https://github.com/robse7en/scoping-toolkit/blob/main/docs/assets/scoping-toolkit-workflow.png)
 
 `/verify-scope artifacts` writes
 `docs/project-scope/verification/artifact-consistency.md` with machine-readable
