@@ -23,4 +23,5 @@ dist/
 /tests/__pycache__
 /.serena
 /docs/superpowers
+/docs/plans
 /docs/project-scope/_scripts/__pycache__
