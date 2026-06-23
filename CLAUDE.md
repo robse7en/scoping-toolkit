@@ -35,6 +35,8 @@ The toolkit separates two phases:
    artifact verification with explicit user checkpoints.
 2. Implementation: `/implement <task-id>` runs in a fresh session and loads
    only `constraints.md`, `architecture.md`, `decisions.md`, and one task file.
+   It requires a clean worktree before starting and runs a final implementation
+   drift gate before moving a task to `review`.
 
 Progress is tracked in constrained frontmatter. `manifest.md` is a generated
 rollup from `/sync-manifest`.
@@ -45,7 +47,7 @@ rollup from `/sync-manifest`.
 |---|---|
 | `/scope new "<desc>"` | Full scoping pipeline for a new project |
 | `/scope extend "<desc>"` | Scoping pipeline for an addition to an existing system |
-| `/implement <task-id>` | Implement one task in a fresh session |
+| `/implement <task-id>` | Implement one task in a fresh session, then gate review on implementation drift detection |
 | `/qa <task-id>` | Review one task and, if it passes, set `status: done` |
 | `/amend-architecture <task-id>` | Resolve a blocked task via architecture amendment |
 | `/verify-scope features|artifacts|all` | Write feature or artifact verification reports |
@@ -98,7 +100,12 @@ scenarioRefs: []         # optional scenario ids from constraints.md, e.g. [US1]
 | `decisions.md` | `architect-agent` | Append-only ADR log |
 | `manifest.md` | `/sync-manifest` | Never hand-edit |
 | `phases/phase-N-*/tasks/*.md` | `task-writer`; later edited by `/implement`, `/qa`, `scope-reviewer` | One file per task |
-| `verification/*.md` | `scope-verifier` | Read-only feature, artifact, and convergence reports |
+| `verification/*.md` | `scope-verifier` | Read-only feature, artifact, convergence, and implementation drift reports |
+
+Implementation drift reports are timestamped files named
+`implementation-drift-<task-id>-<timestamp>.md`. `/implement` reads their
+frontmatter and leaves the task `in-progress` when `blockingFindings` is greater
+than zero.
 
 ## Editing the toolkit itself
 

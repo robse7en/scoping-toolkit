@@ -77,6 +77,15 @@ frontmatter fields such as `criticalFindings`, `generatedAt`,
 `architectureVersionChecked`, and `taskPathsChecked`. `/implement <task-id>`
 uses that report as a gate and stale-check before implementation continues.
 
+`/implement <task-id>` also requires a clean worktree before it starts. After
+the task-specific implementation checks pass, it runs a final implementation
+drift gate that compares `git diff --name-only HEAD` against the task Scope,
+`touchesFiles`, `architecture.md`, `decisions.md`, and engineering principles.
+The gate writes timestamped reports under
+`docs/project-scope/verification/implementation-drift-*.md`. Blocking drift
+leaves the task `in-progress`; only architecture conflicts move a task to
+`blocked`.
+
 If a coding or QA session hits a real architecture mismatch mid-project, the
 task is set to `blocked` rather than worked around. You resolve it with
 `/amend-architecture <task-id>`, then re-run the post-amendment review and any
@@ -88,7 +97,7 @@ needed scope verification.
 |---|---|
 | `/scope new "<description>"` | Start scoping a brand-new project |
 | `/scope extend "<description>"` | Start scoping an additional module for an existing system |
-| `/implement <task-id>` | Run in a fresh session to implement one task after dependency and artifact-verification checks pass |
+| `/implement <task-id>` | Run in a fresh session to implement one task after dependency and artifact-verification checks pass, then gate review on implementation drift detection |
 | `/qa <task-id>` | Mechanically verify acceptance criteria and become the only path by which a task can reach `status: done` |
 | `/amend-architecture <task-id>` | Resolve a blocked task by amending `architecture.md` |
 | `/verify-scope features|artifacts|all` | Write read-only scope verification reports before implementation |
@@ -122,7 +131,7 @@ needed scope verification.
 | `docs/project-scope/decisions.md` | `architect-agent` only | Append-only ADR log |
 | `docs/project-scope/manifest.md` | `/sync-manifest` only | Generated rollup from a deterministic Python helper |
 | `docs/project-scope/phases/phase-N-<slug>/tasks/*.md` | `task-writer`, `/implement`, `/qa`, `scope-reviewer` | One file per task |
-| `docs/project-scope/verification/*.md` | `scope-verifier` only | Read-only reports for feature review, artifact consistency, and convergence; artifact consistency includes machine-readable frontmatter used by `/implement` |
+| `docs/project-scope/verification/*.md` | `scope-verifier` only | Read-only reports for feature review, artifact consistency, convergence, and implementation drift; artifact consistency and implementation drift reports include machine-readable frontmatter used by `/implement` |
 
 ## Task status lifecycle
 
@@ -151,7 +160,8 @@ architecture.
   (`touchesFiles`), architecture conformance (`architectureVersion`), and
   scenario traceability (`scenarioRefs`) are recorded instead of inferred.
 - Verify before you build. Optional features are rechecked before architecture,
-  and scope artifacts are rechecked before implementation starts.
+  and scope artifacts are rechecked before implementation starts. Implementation
+  drift is checked before a task can move to review.
 - Block, do not improvise. If architecture does not fit reality, surface the
   conflict instead of silently changing course.
 

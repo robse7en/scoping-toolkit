@@ -366,6 +366,46 @@ class GenerateManifestTests(unittest.TestCase):
         self.assertIn("Set `status: blocked`", qa_reviewer)
         self.assertIn("Do not mark the task done", qa_reviewer)
 
+    def test_implement_has_explicit_drift_gate_before_review(self):
+        command = (REPO_ROOT / ".claude/commands/implement.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("clean worktree", command)
+        self.assertIn("`git diff --name-only HEAD`", command)
+        self.assertIn("implementation-drift-gate", command)
+        self.assertIn("`blockingFindings`", command)
+        self.assertIn("leave the task `in-progress`", command)
+        self.assertLess(
+            command.index("implementation-drift-gate"),
+            command.index("Set the task's `status: review`"),
+        )
+
+    def test_scope_verifier_documents_implementation_drift_gate(self):
+        scope_verifier = (REPO_ROOT / ".claude/agents/scope-verifier.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("implementation-drift-gate", scope_verifier)
+        self.assertIn("implementation-drift-<task-id>-<timestamp>.md", scope_verifier)
+        self.assertIn("`contradicts` and `unrequested`", scope_verifier)
+        self.assertIn("`missing` and `partial`", scope_verifier)
+
+    def test_implementation_drift_report_template_has_machine_readable_frontmatter(self):
+        template = (
+            REPO_ROOT
+            / "docs/project-scope/_templates/implementation-drift-report.template.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertTrue(template.startswith("---\n"))
+        self.assertIn("reportMode: implementation-drift-gate", template)
+        self.assertIn("targetTask:", template)
+        self.assertIn("generatedAt:", template)
+        self.assertIn("blockingFindings:", template)
+        self.assertIn("warningFindings:", template)
+        self.assertIn("changedFilesChecked:", template)
+        self.assertIn("allowedTaskFilesChecked:", template)
+
 
 if __name__ == "__main__":
     unittest.main()

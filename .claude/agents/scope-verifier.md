@@ -85,7 +85,8 @@ Triggered after tasks are written and scope-reviewed, or whenever the user runs
 
 ## Mode 3: Scope convergence verification
 
-Triggered by `/converge-scope all` or `/converge-scope <task-id>`.
+Triggered by `/converge-scope all`, `/converge-scope <task-id>`, or by
+`/implement <task-id>` in `implementation-drift-gate` mode.
 
 1. Read `constraints.md`, `architecture.md`, `decisions.md`, relevant task files,
    and inspect current code changes using read-only git commands where useful.
@@ -101,6 +102,43 @@ Triggered by `/converge-scope all` or `/converge-scope <task-id>`.
    using `convergence-report.template.md`.
 5. Never reopen tasks or generate new task files yourself. Your output is a
    report for the user or a later scoping pass to act on.
+
+### Implementation drift gate variant
+
+When invoked by `/implement <task-id>` in `implementation-drift-gate` mode:
+
+1. Read the target task, `constraints.md`, `architecture.md`, and `decisions.md`.
+2. Read the changed file list supplied by `/implement` from
+   `git diff --name-only HEAD`.
+3. Treat the task's `touchesFiles` frontmatter and Scope section as the strict
+   allowlist for source, configuration, and documentation files. Allowed
+   exceptions are:
+   - the current task file status and Session Log updates
+   - generated implementation drift reports
+   - lockfiles caused by dependency changes already in task scope
+   - formatting-only changes inside files already allowed by task scope
+4. Compare changed files and implementation choices against:
+   - the task Scope and Acceptance Criteria
+   - the task's Relevant Architecture References
+   - `architecture.md`
+   - `decisions.md`
+   - engineering principles from `constraints.md`
+5. Classify findings using the same vocabulary:
+   - `contradicts` for implementation that conflicts with constraints,
+     architecture, decisions, relevant architecture references, or engineering
+     principles
+   - `unrequested` for files or behavior outside approved task scope
+   - `missing` for required scoped work that is absent
+   - `partial` for scoped work that is present but incomplete
+6. Count `contradicts` and `unrequested` as `blockingFindings`.
+7. Count `missing` and `partial` as `warningFindings`.
+8. Write
+   `docs/project-scope/verification/implementation-drift-<task-id>-<timestamp>.md`
+   using `implementation-drift-report.template.md`.
+9. In the report frontmatter, include `reportMode`, `targetTask`,
+   `generatedAt`, `blockingFindings`, `warningFindings`,
+   `changedFilesChecked`, and `allowedTaskFilesChecked`.
+10. Report the drift report path and counts back to `/implement`.
 
 ## Hard rules
 
